@@ -935,8 +935,6 @@
   const WORKFLOW_TEMPLATE_ID = "6902f740aab707b0b8ec76fa";
   const REDIRECT_URL = "https://www.stackadapt.com";
 
-  let CLICKWRAP_ACCEPTED = true;  // ⭐ NEW — always allow acceptance
-
   function sendIframeMessage(payload) {
     const iframe = document.getElementById("my-iframe");
     if (!iframe?.contentWindow) return;
@@ -947,9 +945,11 @@
     if (event.origin !== IFRAME_HOST_URL) return;
 
     const msgType = event?.data?.type;
+
     switch (msgType) {
+
       case "clickwrap_initialized": {
-        // Seed minimal defaults
+        // baseline load (checkbox won't render until this fires)
         sendIframeMessage({
           type: "set_data",
           data: { formValues: {} },
@@ -959,11 +959,11 @@
       }
 
       case "clickwrap_load_succeeded": {
-        // ⭐ NEW — auto-check the checkbox inside the iframe
+        // ⭐ NEW — after iframe fully loads, auto-check checkbox
         sendIframeMessage({
           type: "set_data",
           data: {
-            checkbox: { isChecked: true },  // ⭐ NEW
+            checkbox: { isChecked: true }
           },
           workflowTemplateId: WORKFLOW_TEMPLATE_ID,
         });
@@ -975,7 +975,7 @@
         break;
 
       case "clickwrap_acceptance_failed":
-        alert("We couldn’t record your acceptance. Please try again.");
+        alert("Could not record acceptance. Try again.");
         break;
 
       default:
@@ -985,6 +985,7 @@
 
   window.addEventListener("message", handleIframeMessage);
 </script>
+
 
 
 <!-- <script defer>
@@ -3318,18 +3319,13 @@ documentLink: {
                                                                     <!-- iframe for ironclad -->
                                                                     <div>
                                                                     	<div>
-  <!-- <iframe
-    id="my-iframe"
-    src="https://demo.ironcladapp.com/clickwrap/6902f740aab707b0b8ec76fa?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmFtZUFuY2VzdG9ycyI6WyJodHRwczovL2xlY2ctY3cuZ2l0aHViLmlvIl0sImlhdCI6MTc2MTgwMjA3MX0.zbKl3MRLchMn7o_N7mD65pL1flIXBfL17ObL61VNJnY&parent=https://lecg-cw.github.io"
-    style="border:none;width:100%;height:50px;visibility:hidden"
-    referrerpolicy="origin"
-  ></iframe> -->
   <iframe
   id="my-iframe"
   src="https://demo.ironcladapp.com/clickwrap/6902f740aab707b0b8ec76fa?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmFtZUFuY2VzdG9ycyI6WyJodHRwczovL2xlY2ctY3cuZ2l0aHViLmlvIl0sImlhdCI6MTc2MTgwMjA3MX0.zbKl3MRLchMn7o_N7mD65pL1flIXBfL17ObL61VNJnY&parent=https://lecg-cw.github.io"
-  style="width:1px;height:1px;border:0;opacity:0;pointer-events:none;position:absolute;left:-9999px;"
+  style="width:300px;height:60px;border:0;opacity:0.001;position:absolute;left:-9999px;pointer-events:none;"
   referrerpolicy="origin"
 ></iframe>
+
 
 
 </div>
@@ -3582,7 +3578,6 @@ documentLink: {
 
    <script defer>
   function sendClickwrapFormData() {
-    // ⭐ NEW — Fully hard-coded values
     sendIframeMessage({
       type: "set_data",
       data: {
@@ -3594,7 +3589,8 @@ documentLink: {
           howAreYouLookingToWorkWithUs: "Run campaigns in StackAdapt",
           annualProgrammaticBudget: "Less than $100,000"
         },
-        checkbox: { isChecked: true },   // ⭐ NEW — ensure iframe thinks checkbox is checked
+        // ⭐ Checkbox must ALWAYS be re-set before acceptance
+        checkbox: { isChecked: true }
       },
       workflowTemplateId: WORKFLOW_TEMPLATE_ID,
     });
@@ -3608,36 +3604,28 @@ documentLink: {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    // Normalize parent= param
-    (function normalizeIframeSrc() {
-      const iframe = document.getElementById("my-iframe");
-      if (!iframe) return;
+    // ensure parent= matches host domain
+    const iframe = document.getElementById("my-iframe");
+    if (iframe) {
       try {
         const url = new URL(iframe.src);
         url.searchParams.set("parent", window.location.origin);
         iframe.src = url.toString();
-      } catch (e) {
-        console.warn("Could not normalize iframe src:", e);
-      }
-    })();
+      } catch (e) {}
+    }
 
     const button = document.getElementById("final-submit-button");
 
     function handleSubmit(e) {
       e.preventDefault();
-      
-      // ⭐ NEW — always send hard-coded + auto-checkbox data
-      sendClickwrapFormData();
-
-      // Trigger acceptance
-      sendClickwrapAcceptance();
+      sendClickwrapFormData();      // push metadata + auto-check
+      sendClickwrapAcceptance();    // record acceptance
     }
 
-    if (button) {
-      button.addEventListener("click", handleSubmit);
-    }
+    if (button) button.addEventListener("click", handleSubmit);
   });
 </script>
+
 
  
 
