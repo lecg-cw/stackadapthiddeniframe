@@ -3573,34 +3573,52 @@ documentLink: {
                                                         <!-- ironclad 2 script -->
 
        <script defer>
-  function sendClickwrapFormData() {
-    const iframe = document.getElementById("my-iframe");
-    if (!iframe?.contentWindow) return;
+  // function sendClickwrapFormData() {
+  //   const iframe = document.getElementById("my-iframe");
+  //   if (!iframe?.contentWindow) return;
 
-    // HARD-CODED VALUES FOR DEMO
-    const HARDCODED_NAME  = "Acme";
-    const HARDCODED_SIGNER = "Peter Price";
-    const HARDCODED_EMAIL  = "peter@legalengcg.com";
+  //   // HARD-CODED VALUES FOR DEMO
+  //   const HARDCODED_NAME  = "Acme";
+  //   const HARDCODED_SIGNER = "Peter Price";
+  //   const HARDCODED_EMAIL  = "peter@legalengcg.com";
 
-    const HARDCODED_COMPANY_TYPE   = "Agency";
-    const HARDCODED_PROPOSED_WORK  = "Run campaigns in StackAdapt";
-    const HARDCODED_ANNUAL_BUDGET  = "Less than $100,000";
+  //   const HARDCODED_COMPANY_TYPE   = "Agency";
+  //   const HARDCODED_PROPOSED_WORK  = "Run campaigns in StackAdapt";
+  //   const HARDCODED_ANNUAL_BUDGET  = "Less than $100,000";
 
-    sendIframeMessage({
-      type: "set_data",
-      data: {
-        formValues: {
-          counterpartyName: HARDCODED_NAME,
-          counterpartySignerName: HARDCODED_SIGNER,
-          counterpartySignerEmail: HARDCODED_EMAIL,
-          companyType: HARDCODED_COMPANY_TYPE,
-          howAreYouLookingToWorkWithUs: HARDCODED_PROPOSED_WORK,
-          annualProgrammaticBudget: HARDCODED_ANNUAL_BUDGET
-        }
+  //   sendIframeMessage({
+  //     type: "set_data",
+  //     data: {
+  //       formValues: {
+  //         counterpartyName: HARDCODED_NAME,
+  //         counterpartySignerName: HARDCODED_SIGNER,
+  //         counterpartySignerEmail: HARDCODED_EMAIL,
+  //         companyType: HARDCODED_COMPANY_TYPE,
+  //         howAreYouLookingToWorkWithUs: HARDCODED_PROPOSED_WORK,
+  //         annualProgrammaticBudget: HARDCODED_ANNUAL_BUDGET
+  //       }
+  //     },
+  //     workflowTemplateId: WORKFLOW_TEMPLATE_ID,
+  //   });
+  // }
+        function sendClickwrapFormData() {
+  sendIframeMessage({
+    type: "set_data",
+    data: {
+      formValues: {
+        counterpartyName: "Acme",
+        counterpartySignerName: "Peter Price",
+        counterpartySignerEmail: "peter@legalengcg.com",
+        companyType: "Agency",
+        howAreYouLookingToWorkWithUs: "Run campaigns in StackAdapt",
+        annualProgrammaticBudget: "Less than $100,000"
       },
-      workflowTemplateId: WORKFLOW_TEMPLATE_ID,
-    });
-  }
+      checkbox: { isChecked: true }  // <-- REQUIRED FOR INVISIBLE ACCEPTANCE
+    },
+    workflowTemplateId: WORKFLOW_TEMPLATE_ID,
+  });
+}
+
 
   function sendClickwrapAcceptance() {
     sendIframeMessage({
