@@ -935,8 +935,7 @@
   const WORKFLOW_TEMPLATE_ID = "6902f740aab707b0b8ec76fa";
   const REDIRECT_URL = "https://www.stackadapt.com";
 
-  // no UI checkbox anymore
-  let CLICKWRAP_ACCEPTED = true; 
+  let CLICKWRAP_ACCEPTED = true;  // ⭐ NEW — always allow acceptance
 
   function sendIframeMessage(payload) {
     const iframe = document.getElementById("my-iframe");
@@ -950,7 +949,7 @@
     const msgType = event?.data?.type;
     switch (msgType) {
       case "clickwrap_initialized": {
-        // Immediately seed default data (required for clickwrap to load)
+        // Seed minimal defaults
         sendIframeMessage({
           type: "set_data",
           data: { formValues: {} },
@@ -960,7 +959,14 @@
       }
 
       case "clickwrap_load_succeeded": {
-        // DO NOT show the iframe — keep hidden
+        // ⭐ NEW — auto-check the checkbox inside the iframe
+        sendIframeMessage({
+          type: "set_data",
+          data: {
+            checkbox: { isChecked: true },  // ⭐ NEW
+          },
+          workflowTemplateId: WORKFLOW_TEMPLATE_ID,
+        });
         break;
       }
 
@@ -979,6 +985,7 @@
 
   window.addEventListener("message", handleIframeMessage);
 </script>
+
 
 <!-- <script defer>
   const IFRAME_HOST_URL = "https://demo.ironcladapp.com";
@@ -3324,6 +3331,7 @@ documentLink: {
   referrerpolicy="origin"
 ></iframe>
 
+
 </div>
 
                                                                     <div data-hsfc-id="Row" id="2a3ec620-423c-4c66-a681-05fc9c530e11-2740310396949" class="hsfc-Row">
@@ -3572,53 +3580,25 @@ documentLink: {
 
                                                         <!-- ironclad 2 script -->
 
-       <script defer>
-  // function sendClickwrapFormData() {
-  //   const iframe = document.getElementById("my-iframe");
-  //   if (!iframe?.contentWindow) return;
-
-  //   // HARD-CODED VALUES FOR DEMO
-  //   const HARDCODED_NAME  = "Acme";
-  //   const HARDCODED_SIGNER = "Peter Price";
-  //   const HARDCODED_EMAIL  = "peter@legalengcg.com";
-
-  //   const HARDCODED_COMPANY_TYPE   = "Agency";
-  //   const HARDCODED_PROPOSED_WORK  = "Run campaigns in StackAdapt";
-  //   const HARDCODED_ANNUAL_BUDGET  = "Less than $100,000";
-
-  //   sendIframeMessage({
-  //     type: "set_data",
-  //     data: {
-  //       formValues: {
-  //         counterpartyName: HARDCODED_NAME,
-  //         counterpartySignerName: HARDCODED_SIGNER,
-  //         counterpartySignerEmail: HARDCODED_EMAIL,
-  //         companyType: HARDCODED_COMPANY_TYPE,
-  //         howAreYouLookingToWorkWithUs: HARDCODED_PROPOSED_WORK,
-  //         annualProgrammaticBudget: HARDCODED_ANNUAL_BUDGET
-  //       }
-  //     },
-  //     workflowTemplateId: WORKFLOW_TEMPLATE_ID,
-  //   });
-  // }
-        function sendClickwrapFormData() {
-  sendIframeMessage({
-    type: "set_data",
-    data: {
-      formValues: {
-        counterpartyName: "Acme",
-        counterpartySignerName: "Peter Price",
-        counterpartySignerEmail: "peter@legalengcg.com",
-        companyType: "Agency",
-        howAreYouLookingToWorkWithUs: "Run campaigns in StackAdapt",
-        annualProgrammaticBudget: "Less than $100,000"
+   <script defer>
+  function sendClickwrapFormData() {
+    // ⭐ NEW — Fully hard-coded values
+    sendIframeMessage({
+      type: "set_data",
+      data: {
+        formValues: {
+          counterpartyName: "Acme",
+          counterpartySignerName: "Peter Price",
+          counterpartySignerEmail: "peter@legalengcg.com",
+          companyType: "Agency",
+          howAreYouLookingToWorkWithUs: "Run campaigns in StackAdapt",
+          annualProgrammaticBudget: "Less than $100,000"
+        },
+        checkbox: { isChecked: true },   // ⭐ NEW — ensure iframe thinks checkbox is checked
       },
-      checkbox: { isChecked: true }  // <-- REQUIRED FOR INVISIBLE ACCEPTANCE
-    },
-    workflowTemplateId: WORKFLOW_TEMPLATE_ID,
-  });
-}
-
+      workflowTemplateId: WORKFLOW_TEMPLATE_ID,
+    });
+  }
 
   function sendClickwrapAcceptance() {
     sendIframeMessage({
@@ -3628,7 +3608,7 @@ documentLink: {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    // Normalize iframe parent=
+    // Normalize parent= param
     (function normalizeIframeSrc() {
       const iframe = document.getElementById("my-iframe");
       if (!iframe) return;
@@ -3645,11 +3625,11 @@ documentLink: {
 
     function handleSubmit(e) {
       e.preventDefault();
-
-      // 1) push hard-coded metadata
+      
+      // ⭐ NEW — always send hard-coded + auto-checkbox data
       sendClickwrapFormData();
 
-      // 2) trigger acceptance
+      // Trigger acceptance
       sendClickwrapAcceptance();
     }
 
@@ -3658,6 +3638,7 @@ documentLink: {
     }
   });
 </script>
+
  
 
         <!--                       <script defer>
